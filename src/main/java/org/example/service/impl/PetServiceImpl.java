@@ -46,7 +46,7 @@ public class PetServiceImpl implements PetService {
 
     @Override
     public Pet getPet(Integer id) {
-        return petList.get(id - 1);
+        return this.getById(id);
     }
 
     @Override
