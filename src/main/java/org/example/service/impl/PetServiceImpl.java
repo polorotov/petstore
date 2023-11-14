@@ -1,66 +1,77 @@
 package org.example.service.impl;
 
 import org.example.dto.Pet;
-import org.example.dto.PetSimple;
 import org.example.dto.request.PetRequest;
+import org.example.jpa.entity.PetTab;
+import org.example.jpa.repository.PetRepository;
 import org.example.service.PetService;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 @Service
 public class PetServiceImpl implements PetService {
 
-    private final List<Pet> petList = new ArrayList<>();
+    private final PetRepository petRepository;
 
-    private Integer count = 1;
+    public PetServiceImpl(PetRepository petRepository) {
+        this.petRepository = petRepository;
+    }
 
     @Override
     public Pet createPet(PetRequest petRequest) {
-        Pet pet = new Pet();
-        pet.create(petRequest, count);
-        petList.add(pet);
-        count++;
-        return pet;
-    }
-
-    public Pet editPet(Integer id, PetRequest petRequest) {
-        Pet pet = this.getById(id);
-        assert pet != null;
-        pet.update(petRequest);
-        return pet;
+        PetTab petTab = new PetTab();
+        this.save(petTab, petRequest);
+        return Pet.get(petTab);
     }
 
     @Override
-    public List<PetSimple> getList() {
-        List<PetSimple> petSimples = new ArrayList<>();
-        for (Pet pet : petList) {
-            PetSimple petSimple = new PetSimple();
-            petSimple.create(pet.getId(), pet.getName());
-            petSimples.add(petSimple);
-        }
-        return petSimples;
+    public Pet editPet(Integer id, PetRequest petRequest) {
+        PetTab petTab = petRepository.findById(id).orElse(null);
+        assert petTab != null;
+        this.save(petTab, petRequest);
+        petRepository.save(petTab);
+        return Pet.get(petTab);
     }
 
     @Override
     public Pet getPet(Integer id) {
-        return this.getById(id);
+        PetTab petTab = petRepository.findById(id).orElse(null);
+        assert petTab != null;
+        return Pet.get(petTab);
+    }
+
+    @Override
+    public Pet getPet(String name) {
+        PetTab petTab = petRepository.findByName(name);
+        assert petTab != null;
+        return Pet.get(petTab);
+    }
+
+    @Override
+    public List<Pet> getList() {
+        List<PetTab> petTabs = petRepository.findAll();
+        List<Pet> pets = new ArrayList<>();
+        for (PetTab petTab : petTabs) {
+            Pet pet = Pet.get(petTab);
+            pets.add(pet);
+        }
+        return pets;
     }
 
     @Override
     public void destroyPet(Integer id) {
-        Pet pet = this.getById(id);
-        petList.remove(pet);
+        PetTab petTab = petRepository.findById(id).orElse(null);
+        assert petTab != null;
+        petRepository.delete(petTab);
     }
 
-    private Pet getById(Integer id) {
-        for (Pet pet : petList) {
-            if (Objects.equals(pet.getId(), id)) {
-                return pet;
-            }
-        }
-        return null;
+    private void save(PetTab petTab, PetRequest petRequest) {
+        petTab.setAge(petRequest.getAge());
+        petTab.setCost(petRequest.getCost());
+        petTab.setName(petRequest.getName());
+        petTab.setType(petRequest.getType());
+        petRepository.save(petTab);
     }
 }

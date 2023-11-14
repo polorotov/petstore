@@ -7,8 +7,9 @@ import org.example.dto.request.PetRequest;
 import java.util.List;
 
 public interface PetService {
-    List<PetSimple> getList();
+    List<Pet> getList();
     Pet getPet(Integer id);
+    Pet getPet(String name);
     Pet createPet(PetRequest petRequest);
     Pet editPet(Integer id, PetRequest petRequest);
     void destroyPet(Integer id);

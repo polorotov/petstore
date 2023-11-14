@@ -20,7 +20,7 @@ public class PetstoreController {
     }
 
     @RequestMapping("/get")
-    public List<PetSimple> getPets() {
+    public List<Pet> getPets() {
         return this.petService.getList();
     }
 
@@ -45,5 +45,11 @@ public class PetstoreController {
     @DeleteMapping("{id}")
     public void deletePet(@PathVariable Integer id) {
         this.petService.destroyPet(id);
+    }
+
+    @GetMapping("/get/name")
+    public ResponseEntity<Pet> getPet(@RequestParam String name) {
+        Pet pet = this.petService.getPet(name);
+        return ResponseEntity.ok(pet);
     }
 }
