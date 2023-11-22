@@ -31,7 +31,6 @@ public class PetServiceImpl implements PetService {
         PetTab petTab = petRepository.findById(id).orElse(null);
         assert petTab != null;
         this.save(petTab, petRequest);
-        petRepository.save(petTab);
         return Pet.get(petTab);
     }
 
